@@ -10,6 +10,7 @@ pipeline {
         string(name: 'version', defaultValue: '1.0.0', description: 'Which version to Deploy')
         string(name: 'environment', defaultValue: 'dev', description: 'Which environment to Deploy')
         booleanParam(name: 'Destroy', defaultValue: false, description: 'Toggle this value')
+        booleanParam(name: 'Deploy', defaultValue: false, description: 'Toggle this value')
     }
     stages {
         stage('Deploy'){
@@ -35,22 +36,21 @@ pipeline {
                 """
             }
         }
-        stage('Approve') {
-            input {
-                message "Should we continue?"
-                ok "Yes, we should."
-                submitter "alice,bob"
-                parameters {
-                    string(name: 'PERSON', defaultValue: 'Mr Jenkins', description: 'Who should I say hello to?')
+        stage('Apply') {
+            when{
+                expression { 
+                    return params.environment == 'dev' && params.Deploy == true 
                 }
             }
+            // input {
+            //     message "Should we continue?"
+            //     ok "Yes, we should."
+            //     submitter "alice,bob"
+            //     parameters {
+            //         string(name: 'PERSON', defaultValue: 'Mr Jenkins', description: 'Who should I say hello to?')
+            //     }
+            // }
             steps {
-                echo "Hello, ${PERSON}, nice to meet you."
-            }
-        }
-
-        stage('Apply'){
-            steps{
                 sh """
                 cd terraform
                 terraform apply -var-file=${params.environment}/${params.environment}.tfvars -var="app_version=${params.version}" -var="environment=${params.environment}" -auto-approve
@@ -63,14 +63,14 @@ pipeline {
                     return params.environment == 'dev' && params.Destroy == true 
                 }
             }
-            input {
-                message "Should we continue?"
-                ok "Yes, we should."
-                submitter "alice,bob"
-                parameters {
-                    string(name: 'PERSON', defaultValue: 'Mr Jenkins', description: 'Who should I say hello to?')
-                }
-            }
+            // input {
+            //     message "Should we continue?"
+            //     ok "Yes, we should."
+            //     submitter "alice,bob"
+            //     parameters {
+            //         string(name: 'PERSON', defaultValue: 'Mr Jenkins', description: 'Who should I say hello to?')
+            //     }
+            // }
             steps{
                 sh """
                 cd terraform
