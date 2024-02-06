@@ -39,7 +39,7 @@ pipeline {
         stage('Apply') {
             when{
                 expression { 
-                    return params.environment == 'dev' && params.Deploy == true 
+                   params.Deploy
                 }
             }
             // input {
@@ -60,7 +60,7 @@ pipeline {
         stage('Destory DEV'){
             when{
                 expression { 
-                    return params.environment == 'dev' && params.Destroy == true 
+                    return params.environment == 'dev' && params.Destroy 
                 }
             }
             // input {
